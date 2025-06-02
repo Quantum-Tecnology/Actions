@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\Actions;
 
-use Core\Actions\Contracts\ShouldDefer;
-use Core\Actions\Contracts\ShouldQueue;
-use Core\Actions\Support\DependencyResolver;
+use QuantumTecnology\Actions\Contracts\ShouldDefer;
+use QuantumTecnology\Actions\Contracts\ShouldQueue;
+use QuantumTecnology\Actions\Support\DependencyResolver;
 use RuntimeException;
 
 trait AsAction
