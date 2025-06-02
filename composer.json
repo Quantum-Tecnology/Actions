@@ -33,9 +33,14 @@
         "stan": [
             "vendor/bin/phpstan analyse --memory-limit=2G"
         ],
+        "test": [
+            "vendor/bin/pest"
+        ],
         "ci": [
             "@format",
-            "@rector --dry-run"
+            "@rector --dry-run",
+            "@pint --test",
+            "@test --parallel"
         ]
     },
     "config": {

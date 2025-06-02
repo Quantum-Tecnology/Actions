@@ -6,11 +6,7 @@ use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__ . '/app',
-        __DIR__ . '/bootstrap/app.php',
-        __DIR__ . '/database',
-        __DIR__ . '/tests',
-        __DIR__ . '/routes',
+        __DIR__ . '/src',
     ])
     ->withPreparedSets(
         deadCode: true,
