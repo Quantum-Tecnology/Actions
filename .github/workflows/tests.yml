@@ -1,4 +1,4 @@
-name: Create Patch Tag on Release Merge
+name: Running Tests
 
 on:
   push:
