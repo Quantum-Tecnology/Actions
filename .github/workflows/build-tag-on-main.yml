@@ -68,5 +68,4 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git tag "${{ env.NEW_TAG }}"
-          git remote set-url origin https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git
-          git push origin "${{ env.NEW_TAG }}"
+          git push https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git "${{ env.NEW_TAG }}"
