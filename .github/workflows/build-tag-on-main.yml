@@ -12,23 +12,29 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Cancel if only CHANGELOG.md has been changed
+        id: change_log
         run: |
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
           FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l)
           if [ "$FILE_COUNT" -eq 1 ] && [ "$CHANGED_FILES" = "CHANGELOG.md" ]; then
             echo "Apenas o CHANGELOG.md foi alterado. Cancelando workflow."
-            exit 1
+            echo "only_file=true" >> $GITHUB_OUTPUT
+          else
+            echo "only_file=false" >> $GITHUB_OUTPUT
           fi
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        if: steps.change_log.outputs.only_file == 'false'
 
       - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
+        if: steps.change_log.outputs.only_file == 'false'
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
         run: composer ci
 
       - name: Create initial tag if no tag exists
+        if: steps.change_log.outputs.only_file == 'false'
         id: first_tag
         run: |
           git fetch --tags
@@ -45,7 +51,7 @@ jobs:
           fi
       - name: Get latest stable version
         id: stable
-        if: steps.first_tag.outputs.exists == 'true'
+        if: steps.first_tag.outputs.exists == 'true' && steps.change_log.outputs.only_file == 'false'
         run: |
           git fetch --tags
           latest=$(git tag --list --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?$' | head -n 1)
@@ -60,7 +66,7 @@ jobs:
 
       - name: Get next build number
         id: build
-        if: steps.first_tag.outputs.exists == 'true'
+        if: steps.first_tag.outputs.exists == 'true' && steps.change_log.outputs.only_file == 'false'
         run: |
           echo "LATEST_TAG from environment: ${{ env.LATEST_TAG }}"
           prefix=$LATEST_TAG
@@ -71,7 +77,7 @@ jobs:
           echo "Next build tag will be: $NEW_TAG"
 
       - name: Push new tag
-        if: steps.first_tag.outputs.exists == 'true'
+        if: steps.first_tag.outputs.exists == 'true' && steps.change_log.outputs.only_file == 'false'
         run: |
           git tag "${{ env.NEW_TAG }}"
           git push origin "${{ env.NEW_TAG }}"
