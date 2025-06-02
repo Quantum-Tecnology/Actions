@@ -7,6 +7,11 @@
             "Quantumtecnology\\Actions\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Bruno Henrique da Costa",
