@@ -20,12 +20,6 @@ jobs:
           DB_DATABASE: database/database.sqlite
         run: composer ci
 
-      - name: Configure remote git with GH_PAT
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          git remote set-url origin https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git
-
       - name: Create initial tag if no tag exists
         id: first_tag
         run: |
