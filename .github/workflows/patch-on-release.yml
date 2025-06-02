@@ -11,16 +11,41 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cancel if only CHANGELOG.md has been changed
+        id: change_log
+        run: |
+          echo "Commit anterior: ${{ github.event.before }}"
+          echo "Commit atual: ${{ github.sha }}"
+          
+          git fetch origin main --depth=2
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          
+          echo "Arquivos alterados:"
+          echo "$CHANGED_FILES"
+          
+          ONLY_CHANGELOG=$(echo "$CHANGED_FILES" | grep -v '^CHANGELOG\.md$' | wc -l)
+          
+          if [ "$ONLY_CHANGELOG" -eq 0 ] && echo "$CHANGED_FILES" | grep -q '^CHANGELOG\.md$'; then
+            echo "Apenas o CHANGELOG.md foi alterado. Cancelando workflow."
+            echo "only_file=true" >> $GITHUB_OUTPUT
+          else
+            echo "Outros arquivos foram alterados."
+            echo "only_file=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        if: steps.change_log.outputs.only_file == 'false'
 
       - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
+        if: steps.change_log.outputs.only_file == 'false'
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
         run: composer ci
 
       - name: Extract release version
+        if: steps.change_log.outputs.only_file == 'false'
         id: extract
         run: |
           git fetch --tags
@@ -28,6 +53,7 @@ jobs:
           echo "RELEASE_BASE=$base_branch" >> $GITHUB_ENV
 
       - name: Get next patch version
+        if: steps.change_log.outputs.only_file == 'false'
         id: next_patch
         run: |
           major=$(echo "$RELEASE_BASE" | cut -d. -f1)
@@ -44,6 +70,7 @@ jobs:
           echo "NEW_PATCH=$new_tag" >> $GITHUB_ENV
 
       - name: Create and push patch tag
+        if: steps.change_log.outputs.only_file == 'false'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
