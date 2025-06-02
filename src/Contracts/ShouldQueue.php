@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Core\Actions\Contracts;
+namespace QuantumTecnology\Actions\Contracts;
 
 interface ShouldQueue
 {

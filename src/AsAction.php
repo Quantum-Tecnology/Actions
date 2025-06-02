@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Core\Actions;
+namespace QuantumTecnology\Actions;
 
 use Core\Actions\Contracts\ShouldDefer;
 use Core\Actions\Contracts\ShouldQueue;

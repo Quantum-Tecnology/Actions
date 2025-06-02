@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Core\Actions\Job;
+namespace QuantumTecnology\Actions\Job;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,7 +18,8 @@ final class ActionJob implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        public mixed $action,
+        public object $action,
+        /** @var array<int, mixed> $arguments */
         public array $arguments = [],
     ) {
         //
@@ -26,6 +27,8 @@ final class ActionJob implements ShouldQueue
 
     public function handle(): void
     {
-        $this->action->execute(...$this->arguments);
+        if (method_exists($this->action, 'execute')) {
+            $this->action->execute(...$this->arguments);
+        }
     }
 }

@@ -2,31 +2,30 @@
 
 declare(strict_types = 1);
 
-namespace Core\Actions\Support;
+namespace QuantumTecnology\Actions\Support;
 
 use Closure;
-use Core\Actions\Exceptions\DependencyUnresolvable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Application;
-use Laravel\SerializableClosure\SerializableClosure;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 
 final readonly class DependencyResolver
 {
     /**
      * Resolve the dependencies of a closure or serializable closure.
      *
-     * @throws ReflectionException|BindingResolutionException|DependencyUnresolvable
+     * @param array<int, mixed> $arguments
+     *
+     * @return array<string, mixed>
+     *
+     * @throws ReflectionException|BindingResolutionException
      */
-    public function resolve($closure, array $arguments = []): array
+    public function resolve(string $closure, array $arguments = []): array
     {
         $container = app(Container::class);
-
-        $closure = $closure instanceof SerializableClosure
-            ? $closure->getClosure()
-            : $closure;
 
         $reflection = new ReflectionMethod($closure, 'execute');
 
@@ -36,7 +35,11 @@ final readonly class DependencyResolver
         $application = app(Application::class);
 
         if (count($arguments) === count($parameters)) {
-            return $arguments;
+            foreach ($parameters as $index => $parameter) {
+                $resolved[$parameter->name] = $arguments[$index];
+            }
+
+            return $resolved;
         }
 
         foreach ($parameters as $parameter) {
@@ -52,7 +55,7 @@ final readonly class DependencyResolver
 
             $type = $parameter->getType();
 
-            if (method_exists($type, 'getName') && !$type->isBuiltin()) {
+            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
                 $resolved[$parameter->name] = $application->make($type->getName());
 
                 continue;
