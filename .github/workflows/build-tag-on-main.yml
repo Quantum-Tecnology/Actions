@@ -20,6 +20,12 @@ jobs:
           DB_DATABASE: database/database.sqlite
         run: composer ci
 
+      - name: Configure remote git with GH_PAT
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git remote set-url origin https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git
+
       - name: Create initial tag if no tag exists
         id: first_tag
         run: |
@@ -28,7 +34,7 @@ jobs:
             TAG="0.0.0-0"
             echo "No tags found. Creating initial tag: $TAG"
             git tag "$TAG"
-            git push https://bhcosta90:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git "$TAG"
+            git push origin "$TAG"
             echo "Tag created successfully: $TAG"
             echo "exists=false" >> $GITHUB_OUTPUT
           else
@@ -61,12 +67,6 @@ jobs:
           NEW_TAG="$prefix-$count"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
           echo "Next build tag will be: $NEW_TAG"
-
-      - name: Configure remote git with GH_PAT
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
-        run: |
-          git remote set-url origin https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git
 
       - name: Push new tag
         if: steps.first_tag.outputs.exists == 'true'
