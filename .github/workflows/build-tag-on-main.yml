@@ -23,13 +23,12 @@ jobs:
       - name: Create initial tag if no tag exists
         id: first_tag
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
           git fetch --tags
           if [[ -z $(git tag --list) ]]; then            
             TAG="0.0.0-0"
             echo "No tags found. Creating initial tag: $TAG"
             git tag "$TAG"
-            git push origin "$TAG"
+            git push https://bhcosta90:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git "$TAG"
             echo "Tag created successfully: $TAG"
             echo "exists=false" >> $GITHUB_OUTPUT
           else
@@ -67,5 +66,4 @@ jobs:
         if: steps.first_tag.outputs.exists == 'true'
         run: |
           git tag "${{ env.NEW_TAG }}"
-          git remote set-url origin https://x-access-token:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
-          git push origin "${{ env.NEW_TAG }}"
+          git push https://bhcosta90:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git "${{ env.NEW_TAG }}"
