@@ -4,9 +4,9 @@ declare(strict_types = 1);
 
 namespace QuantumTecnology\Actions;
 
-use Core\Actions\Contracts\ShouldDefer;
-use Core\Actions\Contracts\ShouldQueue;
-use Core\Actions\Support\DependencyResolver;
+use QuantumTecnology\Actions\Contracts\ShouldDefer;
+use QuantumTecnology\Actions\Contracts\ShouldQueue;
+use QuantumTecnology\Actions\Support\DependencyResolver;
 use RuntimeException;
 
 trait AsAction
@@ -15,8 +15,9 @@ trait AsAction
     {
         $instance = self::getInstance();
 
-        $hasShouldQueue = in_array(ShouldQueue::class, class_implements($instance));
-        $hasShouldDefer = in_array(ShouldDefer::class, class_implements($instance));
+        $classImplements = class_implements($instance);
+        $hasShouldQueue  = in_array(ShouldQueue::class, $classImplements, true);
+        $hasShouldDefer  = in_array(ShouldDefer::class, $classImplements, true);
 
         if ($hasShouldQueue && $hasShouldDefer) {
             throw new RuntimeException('The action class cannot implement both ShouldQueue and ShouldDefer interfaces at the same time.');
