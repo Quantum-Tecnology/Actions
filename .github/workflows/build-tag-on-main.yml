@@ -62,10 +62,14 @@ jobs:
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
           echo "Next build tag will be: $NEW_TAG"
 
-      - name: Push new tag
-        if: steps.first_tag.outputs.exists == 'true'
+      - name: Configure remote git with GH_PAT
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
+          git remote set-url origin https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git
+
+      - name: Push new tag
+        if: steps.first_tag.outputs.exists == 'true'
+        run: |
           git tag "${{ env.NEW_TAG }}"
-          git push https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git "${{ env.NEW_TAG }}"
+          git push origin "${{ env.NEW_TAG }}"
