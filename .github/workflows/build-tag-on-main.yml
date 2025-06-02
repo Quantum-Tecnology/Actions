@@ -68,4 +68,5 @@ jobs:
           TOKEN: ${{ secrets.HASH_TOKEN }}
         run: |
           git tag "${{ env.NEW_TAG }}"
-          git push https://bhcosta90:${TOKEN}@github.com/Quantum-Tecnology/Actions.git "${{ env.NEW_TAG }}"
+          git remote set-url origin https://bhcosta90:${TOKEN}@github.com/Quantum-Tecnology/Actions.git
+          git push origin "${{ env.NEW_TAG }}"
