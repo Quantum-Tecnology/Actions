@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Quantumtecnology\Actions\Providers;
+namespace QuantumTecnology\Actions\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

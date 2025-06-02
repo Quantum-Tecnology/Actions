@@ -4,7 +4,7 @@
     "description": "Actions",
     "autoload": {
         "psr-4": {
-            "Quantumtecnology\\Actions\\": "src/"
+            "QuantumTecnology\\Actions\\": "src/"
         }
     },
     "autoload-dev": {
@@ -44,7 +44,7 @@
         "ci": [
             "@format",
             "@rector --dry-run",
-            "@pint --test",
+            "@stan",
             "@test --parallel"
         ]
     },
