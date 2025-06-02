@@ -15,11 +15,16 @@ jobs:
         id: change_log
         run: |
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          FILE_COUNT=$(echo "$CHANGED_FILES" | wc -l)
-          if [ "$FILE_COUNT" -eq 1 ] && [ "$CHANGED_FILES" = "CHANGELOG.md" ]; then
+          echo "Arquivos alterados: $CHANGED_FILES"
+          
+          # Conta o número de arquivos diferentes de CHANGELOG.md
+          NON_CHANGELOG=$(echo "$CHANGED_FILES" | grep -v '^CHANGELOG\.md$' | wc -l)
+          
+          if [ "$NON_CHANGELOG" -eq 0 ]; then
             echo "Apenas o CHANGELOG.md foi alterado. Cancelando workflow."
             echo "only_file=true" >> $GITHUB_OUTPUT
           else
+            echo "Outros arquivos além do CHANGELOG.md foram alterados."
             echo "only_file=false" >> $GITHUB_OUTPUT
           fi
       - name: Install Dependencies
