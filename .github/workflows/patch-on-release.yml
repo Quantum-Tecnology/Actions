@@ -48,5 +48,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git tag "${{ env.NEW_PATCH }}"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
+          git remote set-url origin https://x-access-token:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
           git push origin "${{ env.NEW_PATCH }}"

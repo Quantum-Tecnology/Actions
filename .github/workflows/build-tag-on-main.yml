@@ -23,7 +23,7 @@ jobs:
       - name: Create initial tag if no tag exists
         id: first_tag
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
+          git remote set-url origin https://x-access-token:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
           git fetch --tags
           if [[ -z $(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+-[0-9]+$') ]]; then            
             TAG="0.0.0-0"
@@ -67,5 +67,5 @@ jobs:
         if: steps.first_tag.outputs.exists == 'true'
         run: |
           git tag "${{ env.NEW_TAG }}"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
+          git remote set-url origin https://x-access-token:${{ secrets.HASH_TOKEN }}@github.com/Quantum-Tecnology/Actions.git
           git push origin "${{ env.NEW_TAG }}"
