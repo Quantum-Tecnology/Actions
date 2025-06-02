@@ -65,8 +65,8 @@ jobs:
       - name: Push new tag
         if: steps.first_tag.outputs.exists == 'true'
         env:
-          TOKEN: ${{ secrets.HASH_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           git tag "${{ env.NEW_TAG }}"
-          git remote set-url origin https://bhcosta90:${TOKEN}@github.com/Quantum-Tecnology/Actions.git
+          git remote set-url origin https://bhcosta90:${GH_PAT}@github.com/Quantum-Tecnology/Actions.git
           git push origin "${{ env.NEW_TAG }}"
