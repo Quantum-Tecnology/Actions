@@ -14,17 +14,22 @@ jobs:
       - name: Cancel if only CHANGELOG.md has been changed
         id: change_log
         run: |
+          echo "Commit anterior: ${{ github.event.before }}"
+          echo "Commit atual: ${{ github.sha }}"
+      
+          git fetch origin main --depth=2
           CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-          echo "Arquivos alterados: $CHANGED_FILES"
-          
-          # Conta o número de arquivos diferentes de CHANGELOG.md
-          NON_CHANGELOG=$(echo "$CHANGED_FILES" | grep -v '^CHANGELOG\.md$' | wc -l)
-          
-          if [ "$NON_CHANGELOG" -eq 0 ]; then
+      
+          echo "Arquivos alterados:"
+          echo "$CHANGED_FILES"
+      
+          ONLY_CHANGELOG=$(echo "$CHANGED_FILES" | grep -v '^CHANGELOG\.md$' | wc -l)
+      
+          if [ "$ONLY_CHANGELOG" -eq 0 ] && echo "$CHANGED_FILES" | grep -q '^CHANGELOG\.md$'; then
             echo "Apenas o CHANGELOG.md foi alterado. Cancelando workflow."
             echo "only_file=true" >> $GITHUB_OUTPUT
           else
-            echo "Outros arquivos além do CHANGELOG.md foram alterados."
+            echo "Outros arquivos foram alterados."
             echo "only_file=false" >> $GITHUB_OUTPUT
           fi
       - name: Install Dependencies
