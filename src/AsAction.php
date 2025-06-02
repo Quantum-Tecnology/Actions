@@ -15,8 +15,9 @@ trait AsAction
     {
         $instance = self::getInstance();
 
-        $hasShouldQueue = in_array(ShouldQueue::class, class_implements($instance));
-        $hasShouldDefer = in_array(ShouldDefer::class, class_implements($instance));
+        $classImplements = class_implements($instance);
+        $hasShouldQueue  = in_array(ShouldQueue::class, $classImplements);
+        $hasShouldDefer  = in_array(ShouldDefer::class, $classImplements);
 
         if ($hasShouldQueue && $hasShouldDefer) {
             throw new RuntimeException('The action class cannot implement both ShouldQueue and ShouldDefer interfaces at the same time.');
