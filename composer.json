@@ -1,0 +1,40 @@
+{
+    "name": "quantumtecnology/actions",
+    "license": "MIT",
+    "description": "Actions",
+    "autoload": {
+        "psr-4": {
+            "Quantumtecnology\\Actions\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bruno Henrique da Costa",
+            "email": "bhcosta90@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "laravel/pint": "^1.22",
+        "larastan/larastan": "^3.4",
+        "rector/rector": "^2.0"
+    },
+    "scripts": {
+        "format": [
+            "vendor/bin/pint"
+        ],
+        "rector": [
+            "vendor/bin/rector process"
+        ],
+        "stan": [
+            "vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "ci": [
+            "@format",
+            "@rector --dry-run"
+        ]
+    }
+}
