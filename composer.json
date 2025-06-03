@@ -48,6 +48,13 @@
             "@test --parallel"
         ]
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "QuantumTecnology\\Actions\\Providers\\ActionServiceProvider"
+            ]
+        }
+    },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
