@@ -6,7 +6,7 @@ namespace QuantumTecnology\Actions\Job;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-final class ActionJobUnique extends ActionJob implements ShouldQueue
+final class ActionJobBeUnique extends ActionJob implements ShouldQueue
 {
     public int $uniqueFor = 0;
 }

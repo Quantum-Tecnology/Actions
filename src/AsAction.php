@@ -73,7 +73,7 @@ trait AsAction
         $hasShouldBeUniqueUntilProcessing = in_array(ShouldUniqueQueue::class, $classImplements, true);
 
         $job = match (true) {
-            $hasShouldBeUnique                => new Job\ActionJobUnique($instance, $data),
+            $hasShouldBeUnique                => new Job\ActionJobBeUnique($instance, $data),
             $hasShouldBeUniqueUntilProcessing => new Job\ActionJobBeUniqueUntilProcessing($instance, $data),
             default                           => new Job\ActionJob($instance, $data),
         };
