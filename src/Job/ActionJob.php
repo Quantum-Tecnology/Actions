@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-final class ActionJob implements ShouldQueue
+class ActionJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;

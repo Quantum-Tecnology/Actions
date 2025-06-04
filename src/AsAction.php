@@ -6,11 +6,14 @@ namespace QuantumTecnology\Actions;
 
 use QuantumTecnology\Actions\Contracts\ShouldDefer;
 use QuantumTecnology\Actions\Contracts\ShouldQueue;
+use QuantumTecnology\Actions\Contracts\ShouldUniqueQueue;
 use QuantumTecnology\Actions\Support\DependencyResolver;
 use RuntimeException;
 
 trait AsAction
 {
+    protected static mixed $instanceClass = null;
+
     final public static function run(...$arguments): mixed
     {
         $instance = self::getInstance();
@@ -56,12 +59,24 @@ trait AsAction
 
     protected static function getInstance(): self
     {
-        return app(static::class);
+        if (null !== self::$instanceClass) {
+            self::$instanceClass = app(self::$instanceClass);
+        }
+
+        return self::$instanceClass;
     }
 
     protected static function dispatchJob($instance, $data): bool
     {
-        $job = new Job\ActionJob($instance, $data);
+        $classImplements                  = class_implements($instance);
+        $hasShouldBeUnique                = in_array(ShouldUniqueQueue::class, $classImplements, true);
+        $hasShouldBeUniqueUntilProcessing = in_array(ShouldUniqueQueue::class, $classImplements, true);
+
+        $job = match (true) {
+            $hasShouldBeUnique                => new Job\ActionJobUnique($instance, $data),
+            $hasShouldBeUniqueUntilProcessing => new Job\ActionJobBeUniqueUntilProcessing($instance, $data),
+            default                           => new Job\ActionJob($instance, $data),
+        };
 
         if (method_exists($instance, 'onQueue')) {
             $job->onQueue($instance->onQueue());
@@ -69,6 +84,14 @@ trait AsAction
 
         if (method_exists($instance, 'delay')) {
             $job->delay($instance->delay());
+        }
+
+        if (method_exists($instance, 'uniqueVia') && method_exists($job, 'uniqueVia')) {
+            $job->uniqueVia();
+        }
+
+        if (method_exists($instance, 'uniqueId') && method_exists($job, 'uniqueId')) {
+            $job->uniqueId();
         }
 
         dispatch($job);
