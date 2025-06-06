@@ -57,10 +57,10 @@ trait AsAction
         return null;
     }
 
-    protected static function getInstance(): self
+    protected static function getInstance(): mixed
     {
-        if (null !== self::$instanceClass) {
-            self::$instanceClass = app(self::$instanceClass);
+        if (null === self::$instanceClass) {
+            self::$instanceClass = app(static::class);
         }
 
         return self::$instanceClass;
@@ -73,7 +73,7 @@ trait AsAction
         $hasShouldBeUniqueUntilProcessing = in_array(ShouldUniqueQueue::class, $classImplements, true);
 
         $job = match (true) {
-            $hasShouldBeUnique                => new Job\ActionJobBeUnique($instance, $data),
+            $hasShouldBeUnique                => new Job\ActionJobUnique($instance, $data),
             $hasShouldBeUniqueUntilProcessing => new Job\ActionJobBeUniqueUntilProcessing($instance, $data),
             default                           => new Job\ActionJob($instance, $data),
         };
