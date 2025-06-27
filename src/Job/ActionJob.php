@@ -73,13 +73,23 @@ class ActionJob implements ShouldQueue
 
         if (is_string($value)) {
             $this->onQueue = $value;
-        } elseif (is_null($value)) {
-            $this->onQueue = null;
-        } elseif (is_int($value) || is_float($value) || is_bool($value)) {
-            $this->onQueue = (string) $value;
-        } else {
-            $this->onQueue = null;
+
+            return;
         }
+
+        if (is_null($value)) {
+            $this->onQueue = null;
+
+            return;
+        }
+
+        if (is_int($value) || is_float($value) || is_bool($value)) {
+            $this->onQueue = (string) $value;
+
+            return;
+        }
+
+        $this->onQueue = null;
     }
 
     /**
@@ -87,7 +97,7 @@ class ActionJob implements ShouldQueue
      *
      * @return array<int>
      */
-    private function castArrayToInt(array $items): array
+    protected function castArrayToInt(array $items): array
     {
         return array_map([$this, 'castToInt'], $items);
     }
@@ -95,12 +105,12 @@ class ActionJob implements ShouldQueue
     /**
      * @param int|float|bool|string|null $item
      */
-    private function castToInt($item): int
+    protected function castToInt($item): int
     {
         return is_int($item) ? $item : (is_numeric($item) ? (int) $item : 0);
     }
 
-    private function getConfigKey(string $env, string $baseKey): string
+    protected function getConfigKey(string $env, string $baseKey): string
     {
         if (null === $this->onQueue || '' === $this->onQueue || '0' === $this->onQueue) {
             return $baseKey . $env . '.default';
@@ -114,7 +124,7 @@ class ActionJob implements ShouldQueue
      *
      * @return array<int, int|float>
      */
-    private function getFallback(string $baseKey, array $default): array
+    protected function getFallback(string $baseKey, array $default): array
     {
         if (null === $this->onQueue || '' === $this->onQueue || '0' === $this->onQueue) {
             return array_values($default);
