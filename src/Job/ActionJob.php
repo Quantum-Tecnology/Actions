@@ -45,32 +45,26 @@ class ActionJob implements ShouldQueue
     }
 
     /**
-     * @return array<int | float|int>
+     * @return array<int>
      */
     public function backoff(): array
     {
         if (filled($this->backoff)) {
-            return $this->backoff;
+            return $this->castArrayToInt($this->backoff);
         }
 
         $env     = app()->environment();
         $baseKey = 'quantum-action.job.backoff.';
-        $default = config($baseKey . 'local.default') ?: [];
+        /** @var array<int, int|float> $default */
+        $default = is_array(config($baseKey . 'local.default')) ? config($baseKey . 'local.default') : [];
 
-        if (null === $this->onQueue || '' === $this->onQueue || '0' === $this->onQueue) {
-            return array_map(
-                fn ($item) => is_int($item) ? $item : (is_numeric($item) ? (int) $item : 0),
-                (array) config($baseKey . $env . '.default', $default)
-            );
-        }
+        $configKey = $this->getConfigKey($env, $baseKey);
+        $fallback  = $this->getFallback($baseKey, $default);
 
-        return array_map(
-            fn ($item) => is_int($item) ? $item : (is_numeric($item) ? (int) $item : 0),
-            (array) config(
-                $baseKey . $env . '.' . $this->onQueue,
-                (array) config($baseKey . $this->onQueue, $default)
-            )
-        );
+        /** @var array<int, mixed> $values */
+        $values = is_array(config($configKey, $fallback)) ? config($configKey, $fallback) : [];
+
+        return $this->castArrayToInt($values);
     }
 
     protected function setOnQueueValue(BackedEnum | UnitEnum | string | null $onQueue): void
@@ -86,5 +80,52 @@ class ActionJob implements ShouldQueue
         } else {
             $this->onQueue = null;
         }
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     *
+     * @return array<int>
+     */
+    private function castArrayToInt(array $items): array
+    {
+        return array_map([$this, 'castToInt'], $items);
+    }
+
+    /**
+     * @param int|float|bool|string|null $item
+     */
+    private function castToInt($item): int
+    {
+        return is_int($item) ? $item : (is_numeric($item) ? (int) $item : 0);
+    }
+
+    private function getConfigKey(string $env, string $baseKey): string
+    {
+        if (null === $this->onQueue || '' === $this->onQueue || '0' === $this->onQueue) {
+            return $baseKey . $env . '.default';
+        }
+
+        return $baseKey . $env . '.' . $this->onQueue;
+    }
+
+    /**
+     * @param array<int, int|float> $default
+     *
+     * @return array<int, int|float>
+     */
+    private function getFallback(string $baseKey, array $default): array
+    {
+        if (null === $this->onQueue || '' === $this->onQueue || '0' === $this->onQueue) {
+            return array_values($default);
+        }
+        $config = config($baseKey . $this->onQueue, $default);
+        $values = is_array($config) ? $config : $default;
+
+        // Garante que todos os valores sejam int|float e reindexa
+        return array_values(array_map(
+            static fn ($v) => is_int($v) || is_float($v) ? $v : 0,
+            $values
+        ));
     }
 }
