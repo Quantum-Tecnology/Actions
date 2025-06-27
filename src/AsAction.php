@@ -68,18 +68,30 @@ trait AsAction
 
     protected static function dispatchJob($instance, $data): bool
     {
+        $backoff = [];
+
+        $queue = null;
+
+        if (method_exists($instance, 'onQueue')) {
+            $queue = $instance->onQueue();
+        }
+
+        if (method_exists($instance, 'backoff')) {
+            $backoff = $instance->backoff();
+        }
+
         $classImplements                  = class_implements($instance);
         $hasShouldBeUnique                = in_array(ShouldUniqueQueue::class, $classImplements, true);
         $hasShouldBeUniqueUntilProcessing = in_array(ShouldUniqueQueue::class, $classImplements, true);
 
         $job = match (true) {
-            $hasShouldBeUnique                => new Job\ActionJobUnique($instance, $data),
-            $hasShouldBeUniqueUntilProcessing => new Job\ActionJobBeUniqueUntilProcessing($instance, $data),
-            default                           => new Job\ActionJob($instance, $data),
+            $hasShouldBeUnique                => new Job\ActionJobUnique($instance, $data, $queue, $backoff),
+            $hasShouldBeUniqueUntilProcessing => new Job\ActionJobBeUniqueUntilProcessing($instance, $queue, $data, $backoff),
+            default                           => new Job\ActionJob($instance, $queue, $data, $backoff),
         };
 
-        if (method_exists($instance, 'onQueue')) {
-            $job->onQueue($instance->onQueue());
+        if ($queue) {
+            $job->onQueue($queue);
         }
 
         if (method_exists($instance, 'delay')) {
