@@ -124,7 +124,7 @@ class ActionJob implements ShouldQueue
 
         // Garante que todos os valores sejam int|float e reindexa
         return array_values(array_map(
-            static fn ($v) => is_int($v) || is_float($v) ? $v : 0,
+            static fn ($v): int|float => is_int($v) || is_float($v) ? $v : 0,
             $values
         ));
     }
