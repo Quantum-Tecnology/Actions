@@ -5,7 +5,10 @@
     "autoload": {
         "psr-4": {
             "QuantumTecnology\\Actions\\": "src/"
-        }
+        },
+        "files": [
+            "src/Support/Helper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
