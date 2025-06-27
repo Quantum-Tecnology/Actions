@@ -73,23 +73,13 @@ class ActionJob implements ShouldQueue
 
         if (is_string($value)) {
             $this->onQueue = $value;
-
-            return;
-        }
-
-        if (is_null($value)) {
+        } elseif (is_null($value)) {
             $this->onQueue = null;
-
-            return;
-        }
-
-        if (is_int($value) || is_float($value) || is_bool($value)) {
+        } elseif (is_int($value) || is_float($value) || is_bool($value)) {
             $this->onQueue = (string) $value;
-
-            return;
+        } else {
+            $this->onQueue = null;
         }
-
-        $this->onQueue = null;
     }
 
     /**
