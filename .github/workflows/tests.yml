@@ -1,16 +1,22 @@
-name: Running Tests
-
+name: Git Flow Automation
 on:
   push:
-    branches-ignore:
-      - main
+    branches: [main, master, 'hotfix/*', 'release/*']
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Choose Action mode'
+        required: true
+        type: choice
+        options: [finalize-package, finalize-release]
+        default: finalize-package
 
 jobs:
-  tests:
+  gitflow:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
@@ -19,3 +25,8 @@ jobs:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
         run: composer ci
+      - name: Run Gitflow Versioning
+        uses: bhcosta90/gitflow-versioning-action@v1
+        with:
+          mode: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode || github.ref == 'refs/heads/main' && 'dev' || startsWith(github.ref, 'refs/heads/hotfix') && 'hotfix-patch' || startsWith(github.ref, 'refs/heads/release') && 'release-patch' }}
+          changelog_entry: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.changelog_entry || '' }}
